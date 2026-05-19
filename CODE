@@ -1,0 +1,226 @@
+#"Bus Ticket Management System – Python & MySQL"
+
+import mysql.connector as myc
+
+mysql = myc.connect(
+    host="localhost",
+    user="root",
+    password="12345",
+    database="busfaremgmt_sys",
+    charset="utf8"
+)
+
+cursor = mysql.cursor()
+
+def modify():
+    print("\n\n CHOOSE A FIELD TO MODIFY ===> ")
+    print("1. NAME")
+    print("2. BOARDING STATION")
+    print("3. DEPARTING STATION")
+    print("4. DATE OF TRIP")
+    print("5. FARE")
+    print("6. QUIT\n")
+
+    c = int(input("ENTER YOUR CHOICE : "))
+    r = input("ENTER THE PASSENGER_ID : ")
+
+    if c == 1:
+        i = input("ENTER CORRECTED NAME : ")
+        q = "UPDATE BUS_LOGS SET pname='{}' WHERE pid='{}'".format(i, r)
+
+    elif c == 2:
+        i = input("ENTER CORRECTED BOARDING STATION: ")
+        q = "UPDATE BUS_LOGS SET start='{}' WHERE pid='{}'".format(i, r)
+
+    elif c == 3:
+        i = input("ENTER CORRECTED DEPARTING STATION: ")
+        q = "UPDATE BUS_LOGS SET stop='{}' WHERE pid='{}'".format(i, r)
+
+    elif c == 4:
+        i = input("ENTER CORRECTED DATE OF TRIP : ")
+        q = "UPDATE BUS_LOGS SET b_date='{}' WHERE pid='{}'".format(i, r)
+
+    elif c == 5:
+        i = int(input("ENTER ADJUSTED AMOUNT : "))
+        q = "UPDATE BUS_LOGS SET fare={} WHERE pid='{}'".format(i, r)
+
+    elif c == 6:
+        menu()
+        return
+
+    else:
+        print("INVALID CHOICE")
+        return modify()
+
+    cursor.execute(q)
+    mysql.commit()
+    print("RECORD UPDATED SUCCESSFULLY")
+    input("PRESS ENTER TO CONTINUE")
+    modify()
+
+
+def search():
+    print("\n\n SEARCH RECORD BY ===> ")
+    print("1. NAME")
+    print("2. PASSENGER'S ID")
+    print("3. BOARDING STATION")
+    print("4. DEPARTING STATION")
+    print("5. DATE OF TRIP")
+    print("6. FARE")
+    print("7. QUIT\n")
+
+    c = int(input("ENTER YOUR CHOICE : "))
+
+    if c == 1:
+        i = input("ENTER NAME : ")
+        q = "SELECT * FROM BUS_LOGS WHERE pname='{}'".format(i)
+
+    elif c == 2:
+        i = input("ENTER PASSENGER'S ID : ")
+        q = "SELECT * FROM BUS_LOGS WHERE pid='{}'".format(i)
+
+    elif c == 3:
+        i = input("ENTER BOARDING STATION: ")
+        q = "SELECT * FROM BUS_LOGS WHERE start='{}'".format(i)
+
+    elif c == 4:
+        i = input("ENTER DEPARTING STATION: ")
+        q = "SELECT * FROM BUS_LOGS WHERE stop='{}'".format(i)
+
+    elif c == 5:
+        i = input("ENTER DATE OF TRIP : ")
+        q = "SELECT * FROM BUS_LOGS WHERE b_date='{}'".format(i)
+
+    elif c == 6:
+        i = input("ENTER FARE : ")
+        q = "SELECT * FROM BUS_LOGS WHERE fare={}".format(i)
+
+    elif c == 7:
+        menu()
+        return
+
+    else:
+        print("INVALID OPTION")
+        input("PRESS ENTER TO CONTINUE")
+        return search()
+
+    cursor.execute(q)
+    L = cursor.fetchall()
+
+    if len(L) == 0:
+        print("NO RECORDS FOUND")
+    else:
+        for a in L:
+            print(a)
+
+    input("PRESS ENTER TO CONTINUE")
+    search()
+
+
+def dis():
+    q = "SELECT * FROM BUS_LOGS"
+    cursor.execute(q)
+    L = cursor.fetchall()
+
+    if len(L) == 0:
+        print("TABLE IS EMPTY\n")
+    else:
+        for a in L:
+            print(a)
+
+    input("PRESS ENTER TO CONTINUE\n")
+    menu()
+
+
+def del1():
+    print("\n\n DELETE RECORD BY ===>")
+    print("1. NAME")
+    print("2. PASSENGER'S ID")
+    print("3. DATE OF BOARDING")
+    print("4. RETURN TO MENU\n")
+
+    choice1 = int(input("ENTER YOUR CHOICE : "))
+
+    if choice1 == 1:
+        i = input("ENTER PASSENGER'S NAME : ")
+        q = "DELETE FROM BUS_LOGS WHERE pname='{}'".format(i)
+
+    elif choice1 == 2:
+        i = input("ENTER PASSENGER'S ID : ")
+        q = "DELETE FROM BUS_LOGS WHERE pid='{}'".format(i)
+
+    elif choice1 == 3:
+        i = input("ENTER DATE OF BOARDING (YYYYMMDD) : ")
+        q = "DELETE FROM BUS_LOGS WHERE b_date='{}'".format(i)
+
+    elif choice1 == 4:
+        menu()
+        return
+
+    else:
+        print("INVALID CHOICE")
+        input("PRESS ENTER TO CONTINUE")
+        return del1()
+
+    cursor.execute(q)
+    mysql.commit()
+    print("RECORD DELETED SUCCESSFULLY")
+    input("PRESS ENTER TO CONTINUE")
+    del1()
+
+
+def add():
+    print("\n")
+    pname = input("ENTER THE PASSENGER'S NAME : ")
+    pid = input("ENTER PASSENGER'S ID : ")
+    start = input("ENTER BOARDING STATION : ")
+    stop = input("ENTER DEPARTING STATION : ")
+    date = input("ENTER DATE OF TRIP (YYYY-MM-DD) : ")
+    fare = int(input("ENTER THE PRICE OF TICKET : "))
+
+    q = "INSERT INTO BUS_LOGS VALUES('{}','{}','{}','{}','{}',{})".format(
+        pname, pid, start, stop, date, fare)
+
+    cursor.execute(q)
+    mysql.commit()
+
+    print("\nDATA ENTERED SUCCESSFULLY\n")
+    i = input("ADD ANOTHER RECORD? (Y/N): ")
+
+    if i.upper() == 'Y':
+        add()
+    else:
+        menu()
+
+
+def menu():
+    print("\n\n MENU ===>")
+    print("1. ADD A RECORD")
+    print("2. DELETE A RECORD")
+    print("3. DISPLAY ALL RECORDS")
+    print("4. SEARCH A SPECIFIC RECORD")
+    print("5. MODIFY A RECORD")
+    print("6. QUIT\n")
+
+    choice = int(input("ENTER YOUR CHOICE : "))
+
+    if choice == 1:
+        add()
+    elif choice == 2:
+        del1()
+    elif choice == 3:
+        dis()
+    elif choice == 4:
+        search()
+    elif choice == 5:
+        modify()
+    elif choice == 6:
+        print("PROGRAM TERMINATED")
+    else:
+        print("INVALID CHOICE")
+        input("PRESS ENTER TO TRY AGAIN")
+        menu()
+
+
+# Start the program
+menu()
